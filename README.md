@@ -22,6 +22,7 @@
 
 用到的js库如下
 > [html2canvas](https://github.com/niklasvh/html2canvas) 一个纯前端js工具用来将页面截取成一个图片
+>
 > [StackBlur](https://github.com/flozz/StackBlur) 使用canvas技术做高斯模糊的js工具，挺好用  
 
 当然，做的这个东西是建立在对性能，对浏览器兼容性等等都不考录的情况下的一个尝试，目前在chrome下测试效果完全没有问题，在IE下好像不太理想，HTML5性能不好
