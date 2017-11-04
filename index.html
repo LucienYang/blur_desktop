@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script type="text/javascript" src="./js/pintuer/jquery.js"></script>
+    <script type="text/javascript" src="./js/bluebird/bluebird.min.js"></script>
+    <script type="text/javascript" src="./js/html2canvas/html2canvas.min.js"></script>
+    <script type="text/javascript" src="./js/html2canvas/html2canvas.svg.min.js"></script>
+    <script type="text/javascript" src="./js/stackblur/stackblur.min.js"></script>
+    <script type="text/javascript" src="./js/pintuer/pintuer.js"></script>
+    <script type="text/javascript" src="./js/canvasUtil.js"></script>
+    <script type="text/javascript" src="./js/jquerySlider.plugin.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/index.css">
+    <link rel="stylesheet" type="text/css" href="./js/pintuer/pintuer.css">
+    <script type="text/javascript">
+    $(function(){
+        $("#notificationcolor").css({"opacity":0.6});
+        showTopbar().then(function(){
+            for(var i=0;i<20;i++){
+                var appHtml = getDeskTopApp();
+                $("#container .media-inline").append(appHtml);
+            }
+            $("#container").click(function(){
+                $("#startMenu").slideLeftHide(300);
+                $("#notificationMenu").slideRightHide(300);
+            });
+            $("#startMenuBtn").click(function(){
+                startMenu();
+            });
+            $("#notificationBtn").click(function(){
+                notificationMenu();
+            });
+
+            $(".appicon").hover(function(){
+                $(".apphover").hide();
+                $(this).next(".apphover").show(150);
+            },function(){
+                $(".apphover").hide(150);
+            });
+
+            $(".desktopappicon").hover(function(){
+                $(".desktopapphover").hide();
+                $(this).next(".desktopapphover").show(150);
+            },function(){
+                $(".desktopapphover").hide(150);
+            });
+
+            $("#searchApp").on('keyup',function(){
+                var words = $(this).val();
+                if(words && words.length > 0){
+                    $("#startMenuContent .appicon").each(function(index, obj){
+                        var appName = $(obj).find("strong").text();
+                        if(appName.indexOf(words)<0){
+                            $(obj).closest(".app").addClass("appHide");
+                        }
+                    });
+                }else{
+                    $("#startMenuContent .app").removeClass("appHide");
+                }
+            })
+
+            $(window).resize(function(){
+                if($("#startMenu").is(':visible')){　　//如果node是隐藏的则显示node元素，否则隐藏
+                　　$("#startMenu").slideLeftHide(300);
+                }
+                if($("#notificationMenu").is(':visible')){　　//如果node是隐藏的则显示node元素，否则隐藏
+                　　$("#notificationMenu").slideRightHide(300);
+                }
+                showTopbar();
+            });
+        });
+    });
+
+    function showTopbar(){
+        var width = $(window).width();
+        var height = $(window).height();
+        $("#bgimage").width(width);
+        $("#bgimage").height(height);
+        return new Promise(function(resolve, reject){
+            var canvas=document.getElementById("topbarcanvas");
+            var canvasUtil = new CanvasUtil();
+            canvas = canvasUtil.ImageToCanvas($("#bgimage")[0],canvas);
+            resolve(canvas);
+        }).then(function(canvas){
+            StackBlur.canvasRGB(canvas, 0, 0, width, height, 20);
+        })
+    }
+
+    function startMenu() {
+        if($("#startMenuImg").is(':visible')){
+            $("#startMenu").slideLeftHide(300);
+        }else{
+            var width = $(window).width();
+            var height = $(window).height();
+            html2canvas($('#desktop'), {
+                onrendered: function(canvas) {
+                    StackBlur.canvasRGB(canvas, 0, 0, width, height, 20);
+                    var canvasUtil = new CanvasUtil();
+                    $("#startMenuImg").html('').append(canvasUtil.convertCanvasToJPEG(canvas,0.8));
+                    $("#startMenu").slideLeftShow(300);
+                },
+                width: width,
+                height: height
+            });
+        }
+    }
+
+    function notificationMenu() {
+        if($("#notificationimg").is(':visible')){
+            $("#notificationMenu").slideRightHide(300);
+        }else{
+            var width = $(window).width();
+            var height = $(window).height();
+            html2canvas($('#desktop'), {
+                onrendered: function(canvas) {
+                    StackBlur.canvasRGB(canvas, 0, 0, width, height, 20);
+                    var canvasUtil = new CanvasUtil();
+                    $("#notificationimg").html('').append(canvasUtil.convertCanvasToJPEG(canvas,0.8));
+                    $("#notificationimg img").css({"margin-left":-(width-300)});
+                    $("#notificationMenu").slideRightShow(300);
+                },
+                width: width,
+                height: height
+            });
+        }
+    }
+
+    function getDeskTopApp(){
+        var appTemplete = '<div class="media clearfix desktopapp">'+
+                            '<div class="desktopappicon">'+
+                                '<a href="#">'+
+                                    '<img src="./images/file.png" class="radius" alt="...">'+
+                                '</a>'+
+                                '<div class="media-body">'+
+                                    '<strong>文档</strong>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="desktopapphover"></div>'+
+                        '</div>';
+        return appTemplete;
+    }
+    </script>
+</head>
+<body>
+<img id="bgimage" src="./images/1.jpg" style="display: none;" width="100%" height="100%">
+<div id="desktopTopBar" class="desktopTopBar">
+    <div id="topBarimg" class="topBarimg topBarcommon">
+          <canvas id="topbarcanvas"></canvas>  
+    </div>
+    <div class="topBarcolor topBarcommon">
+        
+    </div>
+    <div class="topBarbutton topBarcommon">
+        <span class="icon icon-apple topbarIcon" id="startMenuBtn"></span>
+        <span class="icon icon-list topbarIcon float-right" id="notificationBtn"></span>
+    </div>
+</div>
+<div id="desktop" class="desktop">
+    <div id="container" class="container bgimage padding-large-top">
+        <div class="line">
+            <div class="media-inline" >
+            
+            </div>
+            
+        </div>
+    </div>
+    <div class="dock">
+        <div class="dockimg dockcommon">
+            
+        </div>
+        <div class="dockcolor dockcommon">
+            
+        </div>
+        <div class="dockapps dockcommon">
+            <div class="line padding dockappsline">
+                <div class="x1">
+                    <img src="./images/Folder Smart.png" class="dockapp tips ring-hover"  data-toggle="hover" data-place="top" title="文件夹">
+                </div>
+                <div class="x1">
+                    <img src="./images/Trash Empty.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/finder.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/google.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/skype.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/qq-logo.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/Safari.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/document-word.png" class="dockapp ring-hover">
+                </div>
+                 <div class="x1">
+                    <img src="./images/document-excel.png" class="dockapp ring-hover">
+                </div>
+                 <div class="x1">
+                    <img src="./images/document-powerpoint.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/photoshop.png" class="dockapp ring-hover">
+                </div>
+                <div class="x1">
+                    <img src="./images/xunlei.png" class="dockapp ring-hover">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="startMenu" class="startMenu">
+    <div id="startMenuImg" class="startMenuCommon startMenuImg">
+    </div>
+    <div id="startMenuColor" class="startMenuCommon startMenuColor">
+    </div>
+    <div id="startMenuContent" class="startMenuCommon startMenuContent">
+        <div class="line">
+            <div class="media-inline startMenuAppLine">
+                <div class="media clearfix app">
+                    <div class="appicon">
+                        <a href="#">
+                            <img src="./images/skype.png" class="radius" alt="...">
+                        </a>
+                        <div class="media-body">
+                            <strong>skype</strong>
+                        </div>
+                    </div>
+                    <div class="apphover"></div>        
+                 </div>
+                 <div class="media clearfix app">
+                    <div class="appicon">
+                        <a href="#">
+                            <img src="./images/google.png" class="radius" alt="...">
+                        </a>
+                        <div class="media-body">
+                            <strong>chrome</strong>
+                        </div>
+                    </div>
+                    <div class="apphover"></div> 
+                 </div>
+                 <div class="media clearfix app">
+                       <div class="appicon">
+                            <a href="#">
+                                <img src="./images/renren.png" class="radius" alt="...">
+                            </a>
+                            <div class="media-body">
+                                <strong>人人网</strong>
+                            </div>
+                        </div>
+                    <div class="apphover"></div> 
+                 </div>
+                 <div class="media clearfix app">
+                       <div class="appicon">
+                            <a href="#">
+                                <img src="./images/ps.png" class="radius" alt="...">
+                            </a>
+                            <div class="media-body">
+                                <strong>Photeshop</strong>
+                            </div>
+                        </div>
+                    <div class="apphover"></div> 
+                 </div>
+                <div class="media clearfix app">
+                    <div class="appicon">
+                        <a href="#">
+                            <img src="./images/player.png" class="radius" alt="...">
+                        </a>
+                        <div class="media-body">
+                            <strong>播放器</strong>
+                        </div>
+                    </div>
+                    <div class="apphover"></div>        
+                 </div>
+                 <div class="media clearfix app">
+                    <div class="appicon">
+                        <a href="#">
+                            <img src="./images/Eclipse.png" class="radius" alt="...">
+                        </a>
+                        <div class="media-body">
+                            <strong>Eclipse</strong>
+                        </div>
+                    </div>
+                    <div class="apphover"></div> 
+                 </div>
+                 <div class="media clearfix app">
+                       <div class="appicon">
+                            <a href="#">
+                                <img src="./images/qq-logo.png" class="radius" alt="...">
+                            </a>
+                            <div class="media-body">
+                                <strong>QQ</strong>
+                            </div>
+                        </div>
+                    <div class="apphover"></div> 
+                 </div>
+                 <div class="media clearfix app">
+                       <div class="appicon">
+                            <a href="#">
+                                <img src="./images/google.png" class="radius" alt="...">
+                            </a>
+                            <div class="media-body">
+                                <strong>媒体标题</strong>
+                            </div>
+                        </div>
+                    <div class="apphover"></div> 
+                 </div>
+                <div class="media clearfix app">
+                    <div class="appicon">
+                        <a href="#">
+                            <img src="./images/google.png" class="radius" alt="...">
+                        </a>
+                        <div class="media-body">
+                            <strong>媒体标题</strong>
+                        </div>
+                    </div>
+                    <div class="apphover"></div>        
+                 </div>
+                 <div class="media clearfix app">
+                    <div class="appicon">
+                        <a href="#">
+                            <img src="./images/google.png" class="radius" alt="...">
+                        </a>
+                        <div class="media-body">
+                            <strong>媒体标题</strong>
+                        </div>
+                    </div>
+                    <div class="apphover"></div> 
+                 </div>
+                 <div class="media clearfix app">
+                       <div class="appicon">
+                            <a href="#">
+                                <img src="./images/google.png" class="radius" alt="...">
+                            </a>
+                            <div class="media-body">
+                                <strong>媒体标题</strong>
+                            </div>
+                        </div>
+                    <div class="apphover"></div> 
+                 </div>
+                 <div class="media clearfix app">
+                       <div class="appicon">
+                            <a href="#">
+                                <img src="./images/google.png" class="radius" alt="...">
+                            </a>
+                            <div class="media-body">
+                                <strong>媒体标题</strong>
+                            </div>
+                        </div>
+                    <div class="apphover"></div> 
+                 </div>
+             </div>
+        </div>
+        <div class="line startSearch padding">
+            <div class="form-group">
+                <div class="field field-icon-right">
+                    <span class="icon icon-search"></span>
+                    <input type="text" class="input" id="searchApp" name="searchApp" size="30" placeholder="请输入应用名" style="border-radius: 20px;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="notificationMenu" class="notificationMenu">
+    <div id="notificationimg" class="commonnotification notificationimg">
+    </div>
+    <div id="notificationcolor" class="commonnotification notificationcolor">
+    </div>
+    <div id="notificationcontent" class="commonnotification notificationconotent">
+        <div class="line padding">
+            <div class="button-group notificationBtnGroup">
+                <button type="button" class="button notificationBtnActive">
+                    今天</button>
+                <button type="button" class="button notificationBtnUnActive">
+                    通知</button>
+            </div>
+        </div>
+        <div class="line">
+            <hr style="height:1px;border:none;border-top:1px solid #b0b0b0;" />
+        </div>
+        <div class="line padding notificationText">
+            <p>
+                <h1>
+                    11月4日 星期天
+                </h1>
+            </p>
+        </div>
+        <div class="line separate">
+            <p>天气</p>
+        </div>
+        <div class="line padding notificationText">
+            <p>
+                <h4>
+                    西安市 天气晴转多云 20 ℃
+                </h4>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>
