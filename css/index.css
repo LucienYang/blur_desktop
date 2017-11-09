@@ -273,6 +273,8 @@ body {
 .dockapp{
     width: 80%;
     height: 80%;
+    max-width: 80px;
+    max-height: 80px;
 }
 .tip-body .tip-title{
     z-index: 99999;
