@@ -4,6 +4,8 @@
 先看下效果：
 ![desktop.png](http://upload-images.jianshu.io/upload_images/1784147-03b8c75f09fc99ba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+在线demo:[https://lucienyang.github.io/blur_desktop/](https://lucienyang.github.io/blur_desktop/)
+
 整个页面分为：
 * 顶部工具栏（实现了高斯模糊）
 * 桌面区
